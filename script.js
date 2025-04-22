@@ -9,22 +9,27 @@ const Player = (function () {
 })();
 
 const GameBoard = (function () {
-    let grid = [
-        [null, null, null],
-        [null, null, null],
-        [null, null, null]
-    ];
+    let gridSize = 3; // Normal tic-tac-toe
+    let _grid = Array.from({length: gridSize}, () => Array(gridSize).fill(null));
 
     const setCell = (row, column, player) => {
-        if (grid[row][column] !== null) {
+        if (_grid[row][column] !== null) {
             console.error('Cell already occupied!');
             return;
         }
-        grid[row][column] = player.type;
-    }
+        _grid[row][column] = player.type;
+    };
 
-    return {setCell, grid};
+    const setGridSize = (newSize) => {
+        gridSize = newSize;
+        _grid = Array.from({length: gridSize}, () => Array(gridSize).fill(null));
+    };
+
+    const grid = () => _grid; // Getter function to access the updated grid
+
+    return {setCell, grid, setGridSize};
 })();
+
 
 const GameController = (function () {
     let playerX = Player.createPlayer('Player X', 1);
@@ -101,7 +106,7 @@ const GameController = (function () {
 
         GameBoard.setCell(row, column, player);
 
-        let result = checkForWinner(GameBoard.grid);
+        let result = checkForWinner(GameBoard.grid());
 
         if (result == null) {return} // Round is not over
         
@@ -126,17 +131,3 @@ const GameController = (function () {
 
     return {playRound, playerO, playerX, setPlayerName}
 })();
-
-GameController.playRound(0, 0, GameController.playerO);
-GameController.playRound(0, 1, GameController.playerX);
-GameController.playRound(0, 2, GameController.playerO);
-
-GameController.playRound(1, 0, GameController.playerX);
-GameController.playRound(1, 1, GameController.playerX);
-GameController.playRound(1, 2, GameController.playerO);
-
-GameController.playRound(2, 0, GameController.playerX);
-GameController.playRound(2, 1, GameController.playerO);
-GameController.playRound(2, 2, GameController.playerX);
-
-
