@@ -9,8 +9,8 @@ const Player = (function () {
 })();
 
 const GameBoard = (function () {
-    let gridSize = 3; // Normal tic-tac-toe
-    let _grid = Array.from({length: gridSize}, () => Array(gridSize).fill(null));
+    let _gridSize = 3; // Normal tic-tac-toe
+    let _grid = Array.from({length: _gridSize}, () => Array(_gridSize).fill(null));
 
     const setCell = (row, column, player) => {
         if (_grid[row][column] !== null) {
@@ -20,14 +20,16 @@ const GameBoard = (function () {
         _grid[row][column] = player.type;
     };
 
-    const setGridSize = (newSize) => {
-        gridSize = newSize;
-        _grid = Array.from({length: gridSize}, () => Array(gridSize).fill(null));
+    const setgridSize = (newSize) => {
+        _gridSize = newSize;
+        _grid = Array.from({length: _gridSize}, () => Array(_gridSize).fill(null));
     };
 
-    const grid = () => _grid; // Getter function to access the updated grid
+    // Gettters
+    const grid = () => _grid;
+    const gridSize = () => _gridSize;
 
-    return {setCell, grid, setGridSize};
+    return {setCell, grid, gridSize, setgridSize};
 })();
 
 
@@ -159,6 +161,24 @@ const GameController = (function () {
     return {playRound, playerO, playerX, setPlayerName};
 })();
 
-GameController.playRound(0, 0, GameController.playerO()); GameController.playRound(0, 1, GameController.playerX()); GameController.playRound(0, 2, GameController.playerO()); GameController.playRound(1, 0, GameController.playerX()); GameController.playRound(1, 1, GameController.playerX()); GameController.playRound(1, 2, GameController.playerO()); GameController.playRound(2, 0, GameController.playerX()); GameController.playRound(2, 1, GameController.playerO()); GameController.playRound(2, 2, GameController.playerX());
+const Display = (function () {
+    let gridContainer = document.getElementById('grid');
 
-console.log(GameBoard.grid())
+    const clearGrid = () => gridContainer.innerHTML = '';
+
+    const makeGrid = (grid) => {
+        clearGrid();
+        document.querySelector(':root').style.setProperty('--grid-size', GameBoard.gridSize()); // changing --grid-size for :root
+        for (let i = 0; i < grid.flat().length; i++) { // for all cells
+            let cell = document.createElement('div');
+            cell.className = 'cell';
+            gridContainer.appendChild(cell)
+        }
+    }
+
+    return {makeGrid};
+})();
+
+GameBoard.setgridSize(5);
+
+Display.makeGrid(GameBoard.grid());
