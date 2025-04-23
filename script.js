@@ -32,8 +32,8 @@ const GameBoard = (function () {
 
 
 const GameController = (function () {
-    let playerX = Player.createPlayer('Player X', 1);
-    let playerO = Player.createPlayer('Player O', 0);
+    let _playerX = Player.createPlayer('Player X', 1);
+    let _playerO = Player.createPlayer('Player O', 0);
     let gameOver = false;
 
     // From https://stackoverflow.com/questions/67264023/how-to-find-the-diagonals-of-a-point-in-a-2d-array
@@ -41,14 +41,19 @@ const GameController = (function () {
     function diagonal(matrix, cellX, cellY) {
         let forward = []; // diagonal according forward slash shape: / 
         let backward = []; // diagonal according backslash shape: \
+        // Adding this to track indices
+        let forwardI = [];
+        let backwardI = [];
         let n = matrix.length;
         matrix.forEach((row, y) => {
             let x = cellX - (cellY - y);
             if (x >= 0 && x < n) backward.push(row[x]);
+            backwardI.push([y, x]);
             x = cellX + (cellY - y);
-            if (x >= 0 && x < n) forward.push(row[x]); 
+            if (x >= 0 && x < n) forward.push(row[x]);
+            forwardI.push([y, x]);
         });
-        return [forward, backward];
+        return [forward, backward, forwardI, backwardI];
     }
 
     const checkCells = cells => {
@@ -67,38 +72,56 @@ const GameController = (function () {
         // Check columns
         for (let i = 0; i < grid[0].length; i++) { // Number of columns
             let column = grid.map(function(row, _) {return row[i]});
+            let columnIndices = grid.map((_, rowI) => [rowI, i]);
             result = checkCells(column);
             if (result !== null) { // This means there is a winner
-                return result;
+                return {
+                    winner: result,
+                    location: columnIndices
+                };
             }
         }
 
         // Check rows
         for (let i = 0; i < grid.length; i++) { // Number of rows
             let row = grid[i];
+            let rowIndices = grid[i].map((_, cellI) => [i, cellI]);
             result = checkCells(row);
             if (result !== null) { // This means there is a winner
-                return result;
+                return {
+                    winner: result,
+                    location: rowIndices
+                };
             }
         }
 
         // Check diagonals
         let middleCell = [Math.floor(grid.length / 2), Math.floor(grid[0].length / 2)];
         let diagonals = diagonal(grid, middleCell[0], middleCell[1]);
-        for (let i = 0; i < diagonals.length; i++) {
+        for (let i = 0; i < diagonals.length - 2; i++) { // forward, backward
             let diagonal = diagonals[i];
+            let diagonalIndices = diagonals[i+2]; // forwardI, backwardI
             result = checkCells(diagonal);
             if (result !== null) { // This means there is a winner
-                return result;
+                return {
+                    winner: result,
+                    location: diagonalIndices
+                }
             }
         }
 
         // Check if grid is filled
         if (!grid.flat().includes(null)) { 
-            return 2; // This means it's a tie
+            return {
+                winner: 2,
+                location: null
+            }; // This means it's a tie
         }
 
-        return null; // This means theres no winner
+        return {
+            winner: null,
+            location: null
+        }; // This means theres no winner
     };
 
     const playRound = (row, column, player) => {
@@ -108,26 +131,34 @@ const GameController = (function () {
 
         let result = checkForWinner(GameBoard.grid());
 
-        if (result == null) {return} // Round is not over
+        if (result.winner === null) {return} // Round is not over
         
         gameOver = true;
 
-        switch (result) {
+        switch (result.winner) {
             case 0:
-                console.log(`${playerO.name} wins!`);
+                console.log(`${_playerO.name} wins!`);
+                console.log(result.location)
                 break;
             case 1:
-                console.log(`${playerX.name} wins!`);
+                console.log(`${_playerX.name} wins!`);
+                console.log(result.location)
                 break;
             default:
-                console.log('Its a tie!');
+                console.log('It\'s a tie!');
                 break;
         }
     };
 
-    const setPlayerName = (player, name) => {
-        player.name = name
-    }
+    const setPlayerName = (player, name) => player.name = name;
 
-    return {playRound, playerO, playerX, setPlayerName}
+    // Getters
+    const playerO = () => _playerO;
+    const playerX = () => _playerX;
+
+    return {playRound, playerO, playerX, setPlayerName};
 })();
+
+GameController.playRound(0, 0, GameController.playerO()); GameController.playRound(0, 1, GameController.playerX()); GameController.playRound(0, 2, GameController.playerO()); GameController.playRound(1, 0, GameController.playerX()); GameController.playRound(1, 1, GameController.playerX()); GameController.playRound(1, 2, GameController.playerO()); GameController.playRound(2, 0, GameController.playerX()); GameController.playRound(2, 1, GameController.playerO()); GameController.playRound(2, 2, GameController.playerX());
+
+console.log(GameBoard.grid())
