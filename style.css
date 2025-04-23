@@ -1,0 +1,28 @@
+:root {
+    --grid-size: 10;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+}
+
+#grid {
+    background-color: rgb(0, 0, 0);
+    aspect-ratio: 1 / 1;
+    width: 70vh;
+
+    display: grid;
+    grid-template-rows: repeat(var(--grid-size), 1fr);
+    grid-template-columns: repeat(var(--grid-size), 1fr);
+    padding: min(1vw, 1vh);
+    gap: 1%;
+}
+
+.cell {
+    background-color: white;
+    padding: calc(2rem / var(--grid-size));
+}
