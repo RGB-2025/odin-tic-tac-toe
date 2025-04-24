@@ -13,6 +13,10 @@ const GameBoard = (function () {
     let _grid = Array.from({length: _gridSize}, () => Array(_gridSize).fill(null));
 
     const setCell = (row, column, player) => {
+        if (row < 0 || row >= _gridSize || column < 0 || column >= _gridSize) {
+            console.error('Out of bounds!');
+            return;
+        }        
         if (_grid[row][column] !== null) {
             console.error('Cell already occupied!');
             return;
@@ -163,22 +167,62 @@ const GameController = (function () {
 
 const Display = (function () {
     let gridContainer = document.getElementById('grid');
+    let cells = {};
 
-    const clearGrid = () => gridContainer.innerHTML = '';
+    const clearGrid = () => {gridContainer.innerHTML = ''; cells = []};
+
+    const cleanGrid = () => gridContainer.querySelectorAll('.xo').forEach(e => e.remove());
 
     const makeGrid = (grid) => {
+        let gridSize = GameBoard.gridSize();
+        let fragment = document.createDocumentFragment(); // to do it all at once
         clearGrid();
-        document.querySelector(':root').style.setProperty('--grid-size', GameBoard.gridSize()); // changing --grid-size for :root
-        for (let i = 0; i < grid.flat().length; i++) { // for all cells
+        document.querySelector(':root').style.setProperty('--grid-size', gridSize); // changing --grid-size for :root
+        for (let i = 0; i < gridSize ** 2; i++) { // for all cells
             let cell = document.createElement('div');
+            let row = Math.floor(i / gridSize);
+            let column = i % gridSize;
             cell.className = 'cell';
-            gridContainer.appendChild(cell)
+            cell.dataset.row = row;
+            cell.dataset.column = column;
+            cells[`${row}-${column}`] = cell;
+            fragment.appendChild(cell);
+        }
+        gridContainer.appendChild(fragment)
+    }
+
+    const render = (grid) => {
+        cleanGrid();
+
+        let gridSize = GameBoard.gridSize();
+
+        for (let position in cells) {
+            let cell = cells[position]
+
+            let row = cell.dataset.row;
+            let column = cell.dataset.column;
+
+            // If empty
+            if (grid[row][column] === null) {continue}
+
+            // If X or O
+            let isX = grid[row][column] == 1;
+
+            let img = cell.querySelector('.xo') || document.createElement('img'); // Exists? If not make one
+            img.src = isX ? 'img/X.svg' : 'img/O.svg';
+            img.alt = isX ? 'X' : 'O';
+            
+            if (!cell.querySelector('.xo')) {
+                img.className = 'xo';
+                cell.appendChild(img);
+            }
         }
     }
 
-    return {makeGrid};
+    return {makeGrid, render};
 })();
 
-GameBoard.setgridSize(5);
-
 Display.makeGrid(GameBoard.grid());
+GameController.playRound(0, 1, GameController.playerO());
+GameController.playRound(1, 1, GameController.playerX());
+Display.render(GameBoard.grid());
