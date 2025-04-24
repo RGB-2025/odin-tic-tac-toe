@@ -40,6 +40,7 @@ const GameBoard = (function () {
 const GameController = (function () {
     let _playerX = Player.createPlayer('Player X', 1);
     let _playerO = Player.createPlayer('Player O', 0);
+    let _turn = _playerX;
     let gameOver = false;
 
     // From https://stackoverflow.com/questions/67264023/how-to-find-the-diagonals-of-a-point-in-a-2d-array
@@ -130,10 +131,12 @@ const GameController = (function () {
         }; // This means theres no winner
     };
 
-    const playRound = (row, column, player) => {
+    const playRound = (row, column) => {
         if (gameOver) {return}
 
-        GameBoard.setCell(row, column, player);
+        GameBoard.setCell(row, column, _turn);
+
+        _turn = _turn === _playerX ? _playerO : _playerX;
 
         let result = checkForWinner(GameBoard.grid());
 
@@ -161,8 +164,9 @@ const GameController = (function () {
     // Getters
     const playerO = () => _playerO;
     const playerX = () => _playerX;
+    const turn = () => _turn;
 
-    return {playRound, playerO, playerX, setPlayerName};
+    return {playRound, playerO, playerX, setPlayerName, turn};
 })();
 
 const Display = (function () {
@@ -172,6 +176,15 @@ const Display = (function () {
     const clearGrid = () => {gridContainer.innerHTML = ''; cells = []};
 
     const cleanGrid = () => gridContainer.querySelectorAll('.xo').forEach(e => e.remove());
+
+    const makeClickFunctionality = (cell, position) => {
+        cell.addEventListener('click', () => {
+            if (GameController.turn()) {
+                GameController.playRound(position[0], position[1]);
+                render(GameBoard.grid());
+            }
+        })
+    }
 
     const makeGrid = (grid) => {
         let gridSize = GameBoard.gridSize();
@@ -183,9 +196,12 @@ const Display = (function () {
             let row = Math.floor(i / gridSize);
             let column = i % gridSize;
             cell.className = 'cell';
-            cell.dataset.row = row;
-            cell.dataset.column = column;
-            cells[`${row}-${column}`] = cell;
+            cells[`${row}-${column}`] = {
+                cell,
+                value: grid[row][column],
+                position: [row, column]
+            };
+            makeClickFunctionality(cell, [row, column]);
             fragment.appendChild(cell);
         }
         gridContainer.appendChild(fragment)
@@ -196,17 +212,18 @@ const Display = (function () {
 
         let gridSize = GameBoard.gridSize();
 
-        for (let position in cells) {
-            let cell = cells[position]
-
-            let row = cell.dataset.row;
-            let column = cell.dataset.column;
+        for (let id in cells) {
+            let cell = cells[id].cell;
+            let newValue = grid[cells[id].position[0]][cells[id].position[1]];
+            if (cells[id].value !== newValue) {
+                cells[id].value = newValue;
+            }
 
             // If empty
-            if (grid[row][column] === null) {continue}
+            if (cells[id].value === null) {continue}
 
             // If X or O
-            let isX = grid[row][column] == 1;
+            let isX = cells[id].value == GameController.playerX().type;
 
             let img = cell.querySelector('.xo') || document.createElement('img'); // Exists? If not make one
             img.src = isX ? 'img/X.svg' : 'img/O.svg';
@@ -223,6 +240,3 @@ const Display = (function () {
 })();
 
 Display.makeGrid(GameBoard.grid());
-GameController.playRound(0, 1, GameController.playerO());
-GameController.playRound(1, 1, GameController.playerX());
-Display.render(GameBoard.grid());
