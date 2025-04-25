@@ -131,8 +131,8 @@ const GameController = (function () {
         }; // This means theres no winner
     };
 
-    const playRound = (row, column) => {
-        if (gameOver) {return}
+    const playRound = (row, column, value) => {
+        if (gameOver || GameBoard.grid()[row][column] !== null) {return}
 
         GameBoard.setCell(row, column, _turn);
 
