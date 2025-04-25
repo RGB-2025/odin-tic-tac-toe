@@ -147,22 +147,7 @@ const GameController = (function () {
         } // Round is not over
         
         gameOver = true;
-
-        switch (result.winner) {
-            case 0:
-                Display.displayStatus(`${_playerO.name} wins!`);
-                console.log(result.location)
-                break;
-            case 1:
-                Display.displayStatus(`${_playerX.name} wins!`);
-                console.log(result.location)
-                break;
-            default:
-                Display.displayStatus('It\'s a tie!');
-                break;
-        }
-
-        Display.disable();
+        Display.showGameOver(result);
     };
 
     const setPlayerName = (player, name) => player.name = name;
@@ -247,7 +232,27 @@ const Display = (function () {
 
     const displayStatus = text => document.getElementById('status').textContent = text;
 
-    return {makeGrid, render, displayStatus, disable};
+    const showGameOver = (result) => {
+        let resultText = document.getElementById('results');
+        displayStatus(); // clear
+
+        switch (result.winner) {
+            case GameController.playerO().type:
+                resultText.textContent = `${GameController.playerO().name} wins!`;
+                break;
+            case GameController.playerX().type:
+                resultText.textContent = `${GameController.playerX().name} wins!`;
+                break;
+            default:
+                resultText.textContent = 'It\'s a tie!';
+                break;
+        }
+
+        document.getElementById('game-over').showModal();
+        Display.disable();
+    }
+
+    return {makeGrid, render, displayStatus, disable, showGameOver};
 })();
 
 Display.makeGrid(GameBoard.grid());

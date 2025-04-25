@@ -64,3 +64,21 @@ main {
 .disabled {
     background-color: #aaa;
 }
+
+#game-over {
+    position: fixed; 
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid black;
+    background: white;
+    padding: 1rem; 
+    margin: 0;
+    box-shadow: 1rem 1rem 2rem rgba(0, 0, 0, 0.5);
+    padding: 1rem 2rem;
+    border-radius: 1rem;
+}
+
+#game-over::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
