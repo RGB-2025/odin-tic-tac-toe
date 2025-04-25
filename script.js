@@ -196,7 +196,7 @@ const Display = (function () {
             makeClickFunctionality(cell, [row, column]);
             fragment.appendChild(cell);
         }
-        gridContainer.appendChild(fragment)
+        gridContainer.appendChild(fragment);
     }
 
     const render = (grid) => {
@@ -255,4 +255,30 @@ const Display = (function () {
     return {makeGrid, render, displayStatus, disable, showGameOver};
 })();
 
-Display.makeGrid(GameBoard.grid());
+document.getElementById('grid-size').addEventListener('change', (e) => {
+    let self = e.target;
+    let gridDisplay = document.getElementById('grid-display');
+    gridDisplay.textContent = `x ${self.value}`
+    if (Number(self.value) % 2 == 0) {
+        document.getElementById('error').textContent = 'Grid size must be an odd number.';
+    } else {document.getElementById('error').textContent = ''}
+});
+
+document.getElementById('start-form').addEventListener('submit', (e) => {
+    let playerXName = document.getElementById('playerX');
+    let playerOName = document.getElementById('playerO');
+
+    e.preventDefault();
+    if (Number(document.getElementById('grid-size').value) % 2 == 0) {
+        return;
+    }
+
+    GameBoard.setgridSize(Number(document.getElementById('grid-size').value));
+    GameController.setPlayerName(GameController.playerO(), playerOName.value || 'Player O');
+    GameController.setPlayerName(GameController.playerX(), playerXName.value || 'Player X');
+    e.target.className = 'hidden';
+    Display.displayStatus(`${GameController.turn().name}'s turn`);
+    Display.makeGrid(GameBoard.grid());
+    document.getElementById('grid').classList.remove('hidden');
+})
+

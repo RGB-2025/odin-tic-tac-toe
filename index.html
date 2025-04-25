@@ -21,9 +21,23 @@
     </header>
     <main>
         <p id="status"></p>
-        <div id="grid">
-        
+        <div id="grid" class="hidden">
+            
         </div>
+        <form action="javascript:void(0)" id="start-form">
+            <h1>Welcome</h1>
+            <label for="playerX">Player X:</label>
+            <input type="text" name="playerX" id="playerX" placeholder="Player X">
+            <label for="playerO">Player O:</label>
+            <input type="text" name="playerO" id="playerO" placeholder="Player O">
+            <label for="grid-size">Grid Size:</label>
+            <div>
+                <input type="number" name="grid-size" id="grid-size" min="3" max="25" value="3">
+                <p id="grid-display">x 3</p>
+            </div>
+            <p id="error"></p>
+            <button type="submit">Play Game!</button>
+        </form>
     </main>
     <footer>
         <p>By RGB25</p>

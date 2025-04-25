@@ -1,6 +1,8 @@
 :root {
-    --grid-size: 10;
+    --grid-size: 3;
 }
+
+.hidden {display: none !important}
 
 body {
     min-height: 100vh;
@@ -81,4 +83,42 @@ main {
 
 #game-over::backdrop {
     background-color: rgba(0, 0, 0, 0.5);
+}
+
+#start-form {
+    display: grid;
+    grid: repeat(6, auto) / auto 1fr;
+    grid-template-areas:
+        'heading heading'
+        '. .'
+        '. .'
+        '. size'
+        'error error'
+        'submit submit';
+    gap: 1rem;
+}
+
+#start-form h1 {
+    grid-area: heading;
+}
+
+#error {
+    grid-area: error;
+    color: red;
+}
+
+#start-form div {
+    grid-area: size;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#start-form div input {
+    width: 3rem;
+}
+
+#start-form button {
+    grid-area: submit;
 }
