@@ -167,7 +167,14 @@ const Display = (function () {
 
     const clearGrid = () => {gridContainer.innerHTML = ''; cells = []};
 
-    const cleanGrid = () => gridContainer.querySelectorAll('.xo').forEach(e => e.remove());
+    const cleanGrid = () => {
+        gridContainer.querySelectorAll('.xo').forEach(e => e.remove());
+        for (let id in cells) {
+            let cell = cells[id].cell;
+            cell.classList.remove('disabled');
+        }
+        disabled = false
+    };
 
     const makeClickFunctionality = (cell, position) => {
         cell.addEventListener('click', () => {
@@ -252,7 +259,7 @@ const Display = (function () {
         Display.disable();
     }
 
-    return {makeGrid, render, displayStatus, disable, showGameOver};
+    return {makeGrid, render, displayStatus, disable, showGameOver, clearGrid, cleanGrid};
 })();
 
 document.getElementById('grid-size').addEventListener('change', (e) => {
@@ -278,7 +285,18 @@ document.getElementById('start-form').addEventListener('submit', (e) => {
     GameController.setPlayerName(GameController.playerX(), playerXName.value || 'Player X');
     e.target.className = 'hidden';
     Display.displayStatus(`${GameController.turn().name}'s turn`);
-    Display.makeGrid(GameBoard.grid());
+    if (Number(document.getElementById('grid-size').value) !== GameBoard.gridSize() || !document.getElementById('grid').querySelector('.cell')) {
+        // If new
+        Display.clearGrid();
+        Display.makeGrid(GameBoard.grid());
+    }
     document.getElementById('grid').classList.remove('hidden');
-})
+});
+
+document.getElementById('reset').addEventListener('click', () => {
+    document.getElementById('game-over').close()
+    document.getElementById('grid').classList.add('hidden');
+    Display.cleanGrid();
+    document.getElementById('start-form').classList.remove('hidden');
+});
 
