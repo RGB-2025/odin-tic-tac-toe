@@ -26,21 +26,26 @@ const GameBoard = (function () {
 
     const setgridSize = (newSize) => {
         _gridSize = newSize;
-        _grid = Array.from({length: _gridSize}, () => Array(_gridSize).fill(null));
+        resetGrid();
     };
+
+    const resetGrid = () => {
+        _grid = Array.from({length: _gridSize}, () => Array(_gridSize).fill(null));
+    }
 
     // Gettters
     const grid = () => _grid;
     const gridSize = () => _gridSize;
 
-    return {setCell, grid, gridSize, setgridSize};
+    return {setCell, grid, gridSize, setgridSize, resetGrid};
 })();
 
 
 const GameController = (function () {
     let _playerX = Player.createPlayer('Player X', 1);
     let _playerO = Player.createPlayer('Player O', 0);
-    let _turn = _playerX;
+    let defaultTurn = _playerX;
+    let _turn = defaultTurn;
     let gameOver = false;
 
     // From https://stackoverflow.com/questions/67264023/how-to-find-the-diagonals-of-a-point-in-a-2d-array
@@ -152,12 +157,19 @@ const GameController = (function () {
 
     const setPlayerName = (player, name) => player.name = name;
 
+    const startGame = () => {
+        gameOver = false;
+        _turn = defaultTurn;
+        Display.displayStatus(`${GameController.turn().name}'s turn`);
+        GameBoard.resetGrid();
+    };
+
     // Getters
     const playerO = () => _playerO;
     const playerX = () => _playerX;
     const turn = () => _turn;
 
-    return {playRound, playerO, playerX, setPlayerName, turn};
+    return {playRound, playerO, playerX, setPlayerName, turn, startGame};
 })();
 
 const Display = (function () {
@@ -173,7 +185,7 @@ const Display = (function () {
             let cell = cells[id].cell;
             cell.classList.remove('disabled');
         }
-        disabled = false
+        disabled = false;
     };
 
     const makeClickFunctionality = (cell, position) => {
@@ -276,20 +288,25 @@ document.getElementById('start-form').addEventListener('submit', (e) => {
     let playerOName = document.getElementById('playerO');
 
     e.preventDefault();
-    if (Number(document.getElementById('grid-size').value) % 2 == 0) {
+
+    const newGridSize = Number(document.getElementById('grid-size').value);
+
+    if (newGridSize % 2 == 0) {
         return;
     }
 
-    GameBoard.setgridSize(Number(document.getElementById('grid-size').value));
-    GameController.setPlayerName(GameController.playerO(), playerOName.value || 'Player O');
-    GameController.setPlayerName(GameController.playerX(), playerXName.value || 'Player X');
-    e.target.className = 'hidden';
-    Display.displayStatus(`${GameController.turn().name}'s turn`);
-    if (Number(document.getElementById('grid-size').value) !== GameBoard.gridSize() || !document.getElementById('grid').querySelector('.cell')) {
-        // If new
+    const needsReset = newGridSize !== GameBoard.gridSize() || !document.getElementById('grid').querySelector('.cell');
+
+    if (needsReset) {
         Display.clearGrid();
+        GameBoard.setgridSize(newGridSize);
         Display.makeGrid(GameBoard.grid());
     }
+    GameController.setPlayerName(GameController.playerX(), playerXName.value || 'Player X');
+    GameController.setPlayerName(GameController.playerO(), playerOName.value || 'Player O');
+    e.target.className = 'hidden';
+    GameController.startGame();
+    Display.displayStatus(`${GameController.turn().name}'s turn`);
     document.getElementById('grid').classList.remove('hidden');
 });
 
@@ -299,4 +316,3 @@ document.getElementById('reset').addEventListener('click', () => {
     Display.cleanGrid();
     document.getElementById('start-form').classList.remove('hidden');
 });
-
