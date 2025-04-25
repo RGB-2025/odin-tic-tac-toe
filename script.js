@@ -215,8 +215,6 @@ const Display = (function () {
     }
 
     const render = (grid) => {
-        cleanGrid();
-
         for (let id in cells) {
             let cell = cells[id].cell;
             let newValue = grid[cells[id].position[0]][cells[id].position[1]];

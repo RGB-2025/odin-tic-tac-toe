@@ -48,6 +48,19 @@ main {
     padding: calc(2rem / var(--grid-size));
 }
 
+@keyframes grow {
+    from {
+        scale: 0;
+    }
+    to {
+        scale: 1;
+    }
+}
+
+.xo {
+    animation: grow 0.3s forwards;
+}
+
 .disabled {
     background-color: #aaa;
 }
