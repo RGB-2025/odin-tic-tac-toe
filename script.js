@@ -68,8 +68,8 @@ const GameController = (function () {
         if (cells.includes(0) && cells.includes(1)) {return null} // If there are cases like OXX
 
         // This means that its either OOO or XXX
-        let playerXWins = cells.every(cell => cell === 1);
-        let winner = playerXWins ? 1 : 0;
+        let playerXWins = cells.every(cell => cell === _playerX.type);
+        let winner = playerXWins ? _playerX.type : _playerO.type;
         return winner; // We're done checking
     };
 
@@ -136,27 +136,33 @@ const GameController = (function () {
 
         GameBoard.setCell(row, column, _turn);
 
+        // Switch turns
         _turn = _turn === _playerX ? _playerO : _playerX;
 
         let result = checkForWinner(GameBoard.grid());
 
-        if (result.winner === null) {return} // Round is not over
+        if (result.winner === null) {
+            Display.displayStatus(`${_turn.name}'s turn`);
+            return;
+        } // Round is not over
         
         gameOver = true;
 
         switch (result.winner) {
             case 0:
-                console.log(`${_playerO.name} wins!`);
+                Display.displayStatus(`${_playerO.name} wins!`);
                 console.log(result.location)
                 break;
             case 1:
-                console.log(`${_playerX.name} wins!`);
+                Display.displayStatus(`${_playerX.name} wins!`);
                 console.log(result.location)
                 break;
             default:
-                console.log('It\'s a tie!');
+                Display.displayStatus('It\'s a tie!');
                 break;
         }
+
+        Display.disable();
     };
 
     const setPlayerName = (player, name) => player.name = name;
@@ -172,6 +178,7 @@ const GameController = (function () {
 const Display = (function () {
     let gridContainer = document.getElementById('grid');
     let cells = {};
+    let disabled;
 
     const clearGrid = () => {gridContainer.innerHTML = ''; cells = []};
 
@@ -179,7 +186,7 @@ const Display = (function () {
 
     const makeClickFunctionality = (cell, position) => {
         cell.addEventListener('click', () => {
-            if (GameController.turn()) {
+            if (GameController.turn() && !disabled) {
                 GameController.playRound(position[0], position[1]);
                 render(GameBoard.grid());
             }
@@ -200,7 +207,7 @@ const Display = (function () {
                 cell,
                 value: grid[row][column],
                 position: [row, column]
-            };
+            };            
             makeClickFunctionality(cell, [row, column]);
             fragment.appendChild(cell);
         }
@@ -210,14 +217,15 @@ const Display = (function () {
     const render = (grid) => {
         cleanGrid();
 
-        let gridSize = GameBoard.gridSize();
-
         for (let id in cells) {
             let cell = cells[id].cell;
             let newValue = grid[cells[id].position[0]][cells[id].position[1]];
             if (cells[id].value !== newValue) {
                 cells[id].value = newValue;
             }
+
+            // If disabled
+            if (disabled && !cell.classList.contains('disabled')) {cell.classList.add('disabled')};
 
             // If empty
             if (cells[id].value === null) {continue}
@@ -236,7 +244,12 @@ const Display = (function () {
         }
     }
 
-    return {makeGrid, render};
+    
+    const disable = () => {disabled = true; render(GameBoard.grid())};
+
+    const displayStatus = text => document.getElementById('status').textContent = text;
+
+    return {makeGrid, render, displayStatus, disable};
 })();
 
 Display.makeGrid(GameBoard.grid());

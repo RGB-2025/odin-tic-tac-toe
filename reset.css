@@ -76,3 +76,8 @@ h6 {
 #__next {
     isolation: isolate;
 }
+
+html, body {
+    padding: 0;
+    margin: 0;
+}
