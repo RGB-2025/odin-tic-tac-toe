@@ -1,5 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Russo+One&display=swap');
+
 :root {
     --grid-size: 3;
+    font-size: 1.5rem;
+    font-family: 'Nunito';
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Russo One';
 }
 
 .hidden {display: none !important}
@@ -10,6 +18,9 @@ body {
     align-items: stretch;
     justify-content: space-between;
     flex-direction: column;
+    background-color: #0C0C1D;
+    background: linear-gradient(#0C0C1D, #151530);
+    color: #F2F2F7;
 }
 
 footer, main {
@@ -26,6 +37,21 @@ footer {
     justify-content: space-between;
 }
 
+footer a {
+    color: #aaaaff;
+    text-decoration: none;
+    font-weight: normal;
+    transition: font-weight 0.3s;
+}
+
+footer a:hover {
+    font-weight: bold;
+}
+
+footer a:active {
+    color: #8181dc;
+}
+
 main {
     flex: 1;
     flex-direction: column;
@@ -34,7 +60,7 @@ main {
 }
 
 #grid {
-    background-color: rgb(0, 0, 0);
+    background-color: #222236;
     aspect-ratio: 1 / 1;
     width: min(50%, 60vh);
 
@@ -42,29 +68,34 @@ main {
     grid-template-rows: repeat(var(--grid-size), 1fr);
     grid-template-columns: repeat(var(--grid-size), 1fr);
     padding: min(1vw, 1vh);
-    gap: 1%;
+    gap: min(1%, 1rem / var(--grid-size));
+    user-select: none;
 }
 
 .cell {
-    background-color: white;
+    background-color: #0b0b1d;
+    transition: 0.5s;
     padding: calc(2rem / var(--grid-size));
 }
 
 @keyframes grow {
     from {
         scale: 0;
+        opacity: 0;
     }
     to {
         scale: 1;
+        opacity: 1;
     }
 }
 
 .xo {
-    animation: grow 0.3s forwards;
+    animation: grow 0.3s forwards cubic-bezier(.47,1.64,.41,.8);
+    filter: invert(88%) sepia(4%) saturate(144%) hue-rotate(202deg) brightness(109%) contrast(96%);
 }
 
 .disabled {
-    background-color: #aaa;
+    background-color: #000019;
 }
 
 #game-over {
@@ -73,17 +104,43 @@ main {
     left: 50%;
     transform: translate(-50%, -50%);
     border: 1px solid black;
-    background: white;
-    padding: 1rem; 
+    background-color: #151530;
+    background: linear-gradient(#0C0C1D, #151530);
+    padding: 2rem 1rem; 
     margin: 0;
     box-shadow: 1rem 1rem 2rem rgba(0, 0, 0, 0.5);
     padding: 1rem 2rem;
     border-radius: 1rem;
+    text-align: center;
+    color: #F2F2F7;
 }
 
 #game-over::backdrop {
     background-color: rgba(0, 0, 0, 0.5);
 }
+
+#game-over button {
+    margin-top: 1rem;
+    background-color: var(--myColor1);
+    background: linear-gradient(var(--myColor1), var(--myColor2));
+    border: none;
+    padding: 0.5rem 2rem;
+    border-radius: 2rem;
+    transition:
+        --myColor1 0.3s,
+        --myColor2 0.3s,
+        padding 0.3s,
+        color 0.3s;
+}
+
+#game-over button:hover {
+    background-color: #46465B;
+    --myColor1: #46465B;
+    --myColor2: #151530;
+    padding: 0.5rem 2.5rem;
+    color: grey;
+}
+
 
 #start-form {
     display: grid;
@@ -96,6 +153,7 @@ main {
         'error error'
         'submit submit';
     gap: 1rem;
+    align-items: center;
 }
 
 #start-form h1 {
@@ -116,9 +174,113 @@ main {
 }
 
 #start-form div input {
-    width: 3rem;
+    width: fit-content;
 }
 
 #start-form button {
     grid-area: submit;
+}
+
+label {
+    font-weight: bold;
+}
+
+/* From https://www.w3schools.com/howto/howto_css_hide_arrow_number.asp */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+input {
+    background-color: #0C0C1D;
+    outline: none;
+    border: 0px solid #0C0C1D;
+    transition: 0.3s;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+}
+
+input:focus {
+    border: 0.25rem solid #aaaaff;
+}
+
+@property --myColor1 {
+    syntax: '<color>';
+    initial-value: #F2F2F7;
+    inherits: false;
+  }
+  
+  @property --myColor2 {
+    syntax: '<color>';
+    initial-value: #46465B;
+    inherits: false;
+  }
+
+#start-form button {
+    background-color: #F2F2F7;
+    background: linear-gradient(var(--myColor1),var(--myColor2));
+    border: none;
+    font-weight: bolder;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    transition:
+        --myColor1 0.3s,
+        --myColor2 0.3s,
+        padding 0.3s,
+        color 0.3s;
+}
+
+#start-form button:hover {
+    background-color: #46465B;
+    --myColor1: #46465B;
+    --myColor2: #151530;
+    padding: 0.7rem 1rem;
+    color: gray;
+}
+
+/* From: https://t.co/I4yAV2tWNO */
+
+/* enable transitions */
+[popover],
+dialog,
+::backdrop {
+    transition:
+        display 0.3s allow-discrete,
+        overlay 0.3s allow-discrete,
+        opacity 0.3s,
+        transform 0.3s;
+    opacity: 0;
+}
+
+/* On Stage */
+:popover-open,
+:popover-open::backdrop,
+[open],
+[open]::backdrop {
+    opacity: 1;
+}
+
+/* Off Stage */
+@starting-style {
+    :popover-open,
+    :popover-open::backdrop,
+    [open],
+    [open]::backdrop {
+        opacity: 0;
+    }
+}
+
+@layer demo.support {
+    ::backdrop {
+        background-color: rgb(0 0 0 / 50%);
+    }
 }
